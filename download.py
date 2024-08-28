@@ -38,7 +38,7 @@ def fetch_data(url, retries=3, delay=5):
 
 def main():
     try:
-        df_symbols = pd.read_csv('C:/Users/VirenKhanna/Desktop/vault/method-2/ind_nifty50list.csv')
+        df_symbols = pd.read_csv('C:\Users\Guest Users\Downloads\vaul+concourse\ind_nifty50list.csv')
         
         print("Column names in CSV file:", df_symbols.columns)
         

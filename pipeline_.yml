@@ -3,7 +3,7 @@ resources:
   - name: my-repo
     type: git
     source:
-      uri: https://github.com/anjipunsi/vault.git
+      uri: https://github.com/anjipunsi/vault-con.git
       branch: main
 
 jobs:

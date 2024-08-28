@@ -135,7 +135,7 @@ def main():
 
                     db_user = "root"
                     db_password = "root"
-                    db_host = "127.0.0.1"
+                    db_host = "192.168.3.38"
                     db_name = "db"
                     db_port = "3333"  # Change to '3306' 
                     

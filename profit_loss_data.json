@@ -1,0 +1,20 @@
+{
+    "name": "quickstart-jdbc-source-profit-loss-data",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+      "tasks.max": "1",
+      "connection.url": "jdbc:mysql://mysql:3306/connect_test",
+      "connection.user": "root",
+      "connection.password": "test",
+      "mode": "incrementing",
+      "incrementing.column.name": "id",
+      "timestamp.column.name": "id",
+      "topic.prefix": "quickstart-jdbc-profit-loss-data_",
+      "poll.interval.ms": "1000",
+      "table.whitelist": "profit_loss_data",
+      "errors.tolerance": "all",
+      "errors.log.enable": "true",
+      "name": "quickstart-jdbc-source-profit-loss-data"
+    }
+  }
+  

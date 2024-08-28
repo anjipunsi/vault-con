@@ -1,0 +1,110 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    privileged: true
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: root
+    ports:
+      - "3333:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+ 
+ 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.0.0
+    container_name: zookeeper
+    privileged: true
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+ 
+  kafka:
+    image: confluentinc/cp-kafka:5.0.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    links:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_NAMES: PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+ 
+  kafka-connector-mysql:
+    image: confluentinc/cp-kafka-connect:latest
+    container_name: kafka-connector-mysql
+    ports:
+      - "8084:8083"
+    links:
+      - kafka
+      - zookeeper
+      - mysql
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: kafka:9092
+      CONNECT_REST_PORT: 8083
+      CONNECT_GROUP_ID: "quickstart-avro"
+      CONNECT_CONFIG_STORAGE_TOPIC: "quickstart-avro-config"
+      CONNECT_OFFSET_STORAGE_TOPIC: "quickstart-avro-offsets"
+      CONNECT_STATUS_STORAGE_TOPIC: "quickstart-avro-status"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      CONNECT_LOG4J_ROOT_LOGLEVEL: TRACE
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/etc/kafka-connect/jars"
+      # AWS_ACCESS_KEY_ID: AKIA47CRY72S4LURNKXJ
+      # AWS_SECRET_ACCESS_KEY: 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
+    volumes:
+      - ./jars:/etc/kafka-connect/jars
+      - ./kafka-connect-s3:/usr/share/java/kafka-connect-s3
+ 
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:6.0.1
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      - kafka
+      - kafka-connector-mysql
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka:9092'
+      CONTROL_CENTER_CONNECT_CLUSTER: 'kafka-connector-mysql:8083'
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8081"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      PORT: 9021
+   
+  aws-glue:
+    image: amazon/aws-glue-streaming-libs:glue_streaming_libs_4.0.0_image_01
+    container_name: aws-glue
+    ports:
+      - "4040:4040"
+      - "18080:18080"
+    volumes:
+      - ./src/glue:/home/glue_user/workspace/
+    environment:
+      AWS_ACCESS_KEY_ID: AKIA47CRY72S4LURNKXJ
+      AWS_SECRET_ACCESS_KEY: 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
+    stdin_open: true
+    tty: true
+ 
+volumes:
+  mysql-data:
+ 
+

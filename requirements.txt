@@ -1,0 +1,8 @@
+cryptography
+hvac
+bs4
+pandas
+mysql-connector-python
+psycopg2
+sqlalchemy
+pymysql

@@ -1,0 +1,64 @@
+
+resources:
+  - name: my-repo
+    type: git
+    source:
+      uri: https://github.com/anjipunsi/vault.git
+      branch: main
+
+jobs:
+  - name: scrap-data-job
+    plan:
+      - get: my-repo
+        trigger: true
+
+      - task: scrap-data
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: python
+              tag: '3.9'
+          inputs:
+            - name: my-repo
+          run:
+            path: sh
+            args:
+              - -c
+              - |
+                set -ex
+                apt-get update
+                apt-get install -y unzip wget dnsutils
+
+                # Download and install Vault
+                wget https://releases.hashicorp.com/vault/1.13.1/vault_1.13.1_linux_amd64.zip
+                unzip vault_1.13.1_linux_amd64.zip
+                mv vault /usr/local/bin/
+                rm vault_1.13.1_linux_amd64.zip
+                
+                # Install Python dependencies
+                pip install -r ./my-repo/requirements.txt
+
+                chmod +x ./my-repo/fetch_credentials.sh
+                ./my-repo/fetch_credentials.sh
+
+                cd my-repo
+
+                # Run the download script
+                chmod +x download.py
+                python download.py
+
+                # List files in the directory
+                # ls -l
+
+                # Perform a DNS lookup
+                nslookup www.screener.in
+
+
+
+
+
+
+
+

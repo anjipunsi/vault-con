@@ -1,0 +1,20 @@
+{
+    "name": "quickstart-jdbc-source-profit-loss-50-companies",
+    "config": {
+      "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
+      "tasks.max": "1",
+      "connection.url": "jdbc:mysql://mysql:3306/connect_test",
+      "connection.user": "root",
+      "connection.password": "test",
+      "mode": "incrementing",
+      "incrementing.column.name": "id",
+      "timestamp.column.name": "id",
+      "topic.prefix": "quickstart-jdbc-profit-loss-50-companies_",
+      "poll.interval.ms": "1000",
+      "table.whitelist": "profit_loss_50_companies , ttm_50_companies",
+      "errors.tolerance": "all",
+      "errors.log.enable": "true",
+      "name": "quickstart-jdbc-source-profit-loss-50-companies"
+    }
+  }
+  

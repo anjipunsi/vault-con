@@ -1,5 +1,5 @@
 # Set up Vault environment variables
-export VAULT_ADDR='http:// 192.168.3.38:8200'
+export VAULT_ADDR='http://192.168.3.38:8200'
 export VAULT_TOKEN='test'
 
 # Retrieve secrets from Vault
